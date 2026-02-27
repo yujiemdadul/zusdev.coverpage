@@ -21,7 +21,7 @@ export interface TemplateProps {
 }
 
 const PageWrapper: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = "" }) => (
-  <div className={`a4-page bg-white relative overflow-hidden font-['Poppins'] ${className}`} style={{ width: '794px', height: '1123px' }}>
+  <div className={`a4-page bg-white relative overflow-hidden font-['Poppins'] ${className}`} style={{ width: '210mm', height: '295mm' }}>
     {children}
   </div>
 );
@@ -438,8 +438,8 @@ export const Formal: React.FC<TemplateProps> = ({ data }) => (
 export const AbstractWaves: React.FC<TemplateProps> = ({ data }) => (
   <PageWrapper className="bg-slate-50">
     <div className="absolute top-0 left-0 w-full h-full opacity-10" style={{ backgroundImage: 'radial-gradient(#4f46e5 0.5px, transparent 0.5px)', backgroundSize: '20px 20px' }} />
-    <div className="absolute -top-24 -right-24 w-96 h-96 bg-indigo-600 rounded-full blur-3xl opacity-20" />
-    <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-purple-600 rounded-full blur-3xl opacity-20" />
+    <div className="absolute -top-24 -right-24 w-96 h-96 opacity-20" style={{ background: 'radial-gradient(circle, #4f46e5 0%, transparent 70%)' }} />
+    <div className="absolute -bottom-24 -left-24 w-96 h-96 opacity-20" style={{ background: 'radial-gradient(circle, #9333ea 0%, transparent 70%)' }} />
     
     <div className="relative z-10 flex flex-col items-center h-full pt-20 px-16">
       <div className="mb-12">
@@ -670,8 +670,8 @@ export const EcoFriendly: React.FC<TemplateProps> = ({ data }) => (
 export const FuturisticNeon: React.FC<TemplateProps> = ({ data }) => (
   <PageWrapper className="bg-[#050505]">
     <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-fuchsia-600/20 blur-[120px] rounded-full -mr-64 -mt-64" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600/20 blur-[120px] rounded-full -ml-64 -mb-64" />
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] opacity-20" style={{ background: 'radial-gradient(circle, #c026d3 0%, transparent 70%)' }} />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] opacity-20" style={{ background: 'radial-gradient(circle, #2563eb 0%, transparent 70%)' }} />
     </div>
     
     <div className="relative z-10 flex flex-col items-center h-full pt-24 px-16 text-center">
@@ -836,8 +836,8 @@ export const CorporateGrid: React.FC<TemplateProps> = ({ data }) => (
 export const ArtisticBrush: React.FC<TemplateProps> = ({ data }) => (
   <PageWrapper className="bg-[#fafafa]">
     <div className="absolute top-0 right-0 w-full h-full overflow-hidden pointer-events-none">
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-rose-100 rounded-full -mr-32 -mt-32 blur-[100px]" />
-      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-amber-100 rounded-full -ml-32 -mb-32 blur-[100px]" />
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full -mr-32 -mt-32 opacity-30" style={{ background: 'radial-gradient(circle, #ffe4e6 0%, transparent 70%)' }} />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full -ml-32 -mb-32 opacity-30" style={{ background: 'radial-gradient(circle, #fef3c7 0%, transparent 70%)' }} />
     </div>
     
     <div className="relative z-10 flex flex-col items-center h-full pt-24 px-20 text-center">
@@ -1085,7 +1085,7 @@ export const ModernSidebar: React.FC<TemplateProps> = ({ data }) => (
 export const AbstractDots: React.FC<TemplateProps> = ({ data }) => (
   <PageWrapper className="bg-slate-900">
     <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(#6366f1 2px, transparent 2px)', backgroundSize: '30px 30px' }} />
-    <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-600 rounded-full -mr-48 -mt-48 blur-[100px] opacity-30" />
+    <div className="absolute top-0 right-0 w-96 h-96 rounded-full -mr-48 -mt-48 opacity-30" style={{ background: 'radial-gradient(circle, #4f46e5 0%, transparent 70%)' }} />
     
     <div className="relative z-10 flex flex-col items-center h-full pt-24 px-16 text-center">
       <div className="mb-16">
@@ -1349,8 +1349,8 @@ export const BoldHeader: React.FC<TemplateProps> = ({ data }) => (
 export const SoftGradient: React.FC<TemplateProps> = ({ data }) => (
   <PageWrapper className="bg-gradient-to-br from-sky-50 via-white to-pink-50">
     <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-sky-200/30 rounded-full -mr-32 -mt-32 blur-[100px]" />
-      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-pink-200/30 rounded-full -ml-32 -mb-32 blur-[100px]" />
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full -mr-32 -mt-32 opacity-30" style={{ background: 'radial-gradient(circle, #bae6fd 0%, transparent 70%)' }} />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full -ml-32 -mb-32 opacity-30" style={{ background: 'radial-gradient(circle, #fbcfe8 0%, transparent 70%)' }} />
     </div>
     
     <div className="relative z-10 flex flex-col items-center h-full pt-24 px-20 text-center">

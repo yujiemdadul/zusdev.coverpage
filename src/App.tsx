@@ -10,9 +10,14 @@ import {
   Sparkles,
   Palette,
   ArrowRight,
-  ArrowLeft
+  ArrowLeft,
+  Eye,
+  MousePointer2,
+  RefreshCw,
+  Image as ImageIcon
 } from 'lucide-react';
-import html2pdf from 'html2pdf.js';
+import * as htmlToImage from 'html-to-image';
+import { jsPDF } from 'jspdf';
 import * as Templates from './components/Templates';
 import type { FormData } from './components/Templates';
 
@@ -55,6 +60,7 @@ export default function App() {
   const [step, setStep] = useState<Step>('landing');
   const [selectedTemplate, setSelectedTemplate] = useState<string>('ModernBlue');
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     studentName: '',
     rollNumber: '',
@@ -70,6 +76,8 @@ export default function App() {
     collegeName: '',
     logoUrl: '',
   });
+
+  const [showTemplateSwitcher, setShowTemplateSwitcher] = useState(false);
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -90,100 +98,72 @@ export default function App() {
   };
 
   const downloadPDF = async (templateId?: string) => {
-    if (!previewRef.current) return;
+    if (!previewRef.current || isGenerating) return;
     
+    setIsGenerating(true);
     const element = previewRef.current;
     
-    // Create a hidden container for the capture
-    const container = document.createElement('div');
-    container.style.position = 'fixed';
-    container.style.left = '-9999px';
-    container.style.top = '0';
-    container.style.width = '794px';
-    container.style.height = '1123px';
-    container.style.backgroundColor = '#ffffff';
-    
-    const clone = element.cloneNode(true) as HTMLElement;
-    clone.style.transform = 'none';
-    clone.style.display = 'block';
-    clone.style.visibility = 'visible';
-    
-    container.appendChild(clone);
-    document.body.appendChild(container);
-
-    const opt = {
-      margin: 0,
-      filename: `assignment_cover_${formData.studentName || 'page'}.pdf`,
-      image: { type: 'jpeg' as const, quality: 1.0 },
-      html2canvas: { 
-        scale: 2, 
-        useCORS: true, 
-        logging: false,
-        letterRendering: true,
-        backgroundColor: '#ffffff',
-        windowWidth: 794,
-        onclone: (clonedDoc: Document) => {
-          const style = clonedDoc.createElement('style');
-          style.innerHTML = `
-            * { 
-              -webkit-print-color-adjust: exact !important;
-              color-adjust: exact !important;
-              box-sizing: border-box !important;
-            }
-            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-            body { font-family: 'Poppins', sans-serif !important; }
-            .a4-page { width: 794px !important; height: 1123px !important; }
-          `;
-          clonedDoc.head.appendChild(style);
-
-          const allElements = clonedDoc.querySelectorAll('*');
-          allElements.forEach((el) => {
-            const htmlEl = el as HTMLElement;
-            const computed = window.getComputedStyle(htmlEl);
-            
-            // Fix color
-            if (computed.color.includes('oklch') || computed.color.includes('oklab')) {
-              htmlEl.style.color = '#000000';
-            }
-            
-            // Fix background color
-            if (computed.backgroundColor.includes('oklch') || computed.backgroundColor.includes('oklab')) {
-              const fixedBg = computed.backgroundColor.replace(/(oklch|oklab)\([^)]+\)/g, '#ffffff');
-              htmlEl.style.setProperty('background-color', fixedBg, 'important');
-            }
-
-            // Fix background image (gradients)
-            if (computed.backgroundImage.includes('oklch') || computed.backgroundImage.includes('oklab')) {
-              const fixedImg = computed.backgroundImage.replace(/(oklch|oklab)\([^)]+\)/g, '#ffffff');
-              htmlEl.style.setProperty('background-image', fixedImg, 'important');
-            }
-
-            // Fix border color
-            if (computed.borderColor.includes('oklch') || computed.borderColor.includes('oklab')) {
-              const fixedBorder = computed.borderColor.replace(/(oklch|oklab)\([^)]+\)/g, '#000000');
-              htmlEl.style.setProperty('border-color', fixedBorder, 'important');
-            }
-
-            // Fix fill (for SVGs)
-            if (computed.fill && (computed.fill.includes('oklch') || computed.fill.includes('oklab'))) {
-              htmlEl.style.fill = 'currentColor';
-            }
-          });
-        }
-      },
-      jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
-    };
-
     try {
-      // Wait a bit for the clone to be "ready" in the DOM
-      await new Promise(resolve => setTimeout(resolve, 300));
-      await html2pdf().set(opt).from(clone).save();
-    } catch (error) {
+      // Use html-to-image for better quality and modern CSS support
+      const dataUrl = await htmlToImage.toPng(element, {
+        width: 794, // 210mm at 96dpi
+        height: 1115, // 295mm at 96dpi
+        pixelRatio: 2, // Higher quality
+        backgroundColor: '#ffffff',
+        style: {
+          visibility: 'visible',
+          display: 'block',
+          transform: 'none'
+        }
+      });
+
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      pdf.addImage(dataUrl, 'PNG', 0, 0, 210, 295);
+      pdf.save(`assignment_cover_${formData.studentName || 'page'}.pdf`);
+      
+    } catch (error: any) {
       console.error('PDF Generation Error:', error);
-      alert('Download failed. Please try again.');
+      alert('PDF generation failed. Try "Download as Image" instead, or use a different browser.');
     } finally {
-      document.body.removeChild(container);
       setDownloadingId(null);
+      setIsGenerating(false);
+    }
+  };
+
+  const downloadImage = async () => {
+    if (!previewRef.current || isGenerating) return;
+    
+    setIsGenerating(true);
+    const element = previewRef.current;
+    
+    try {
+      const dataUrl = await htmlToImage.toPng(element, {
+        width: 794,
+        height: 1115,
+        pixelRatio: 3, // Very high quality for image
+        backgroundColor: '#ffffff',
+        style: {
+          visibility: 'visible',
+          display: 'block',
+          transform: 'none'
+        }
+      });
+
+      const link = document.createElement('a');
+      link.download = `assignment_cover_${formData.studentName || 'page'}.png`;
+      link.href = dataUrl;
+      link.click();
+      
+    } catch (error: any) {
+      console.error('Image Generation Error:', error);
+      alert('Image generation failed. Please try again.');
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -255,7 +235,7 @@ export default function App() {
             
             <div className="mt-16 sm:mt-24 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl w-full">
               {[
-                { icon: Palette, title: "8+ Templates", desc: "Modern, Minimal, Creative & more" },
+                { icon: Palette, title: "30+ Templates", desc: "Modern, Minimal, Creative & more" },
                 { icon: Layout, title: "A4 Ready", desc: "Perfectly sized for printing" },
                 { icon: Download, title: "Instant PDF", desc: "High quality vector downloads" }
               ].map((feature, i) => (
@@ -330,16 +310,14 @@ export default function App() {
                       {formData.studentName ? (
                         <div className="flex flex-col gap-2">
                           <button
-                            onClick={() => handleDownloadFromSelection(template.id)}
-                            disabled={downloadingId === template.id}
-                            className="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-100 disabled:opacity-50"
+                            onClick={() => {
+                              setSelectedTemplate(template.id);
+                              setStep('preview');
+                            }}
+                            className="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-100"
                           >
-                            {downloadingId === template.id ? (
-                              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            ) : (
-                              <Download size={18} />
-                            )}
-                            Download PDF
+                            <CheckCircle2 size={18} />
+                            Select & Preview
                           </button>
                           <button
                             onClick={() => {
@@ -349,6 +327,13 @@ export default function App() {
                             className="w-full py-3 bg-white text-slate-600 rounded-xl font-bold border border-slate-200 hover:border-indigo-500 hover:text-indigo-600 active:scale-95 transition-all flex items-center justify-center gap-2"
                           >
                             Edit Details
+                          </button>
+                          <button
+                            onClick={() => handleDownloadFromSelection(template.id)}
+                            disabled={downloadingId === template.id}
+                            className="w-full py-3 text-slate-400 font-medium hover:text-indigo-600 transition-colors flex items-center justify-center gap-2 text-sm"
+                          >
+                            {downloadingId === template.id ? 'Downloading...' : 'Quick Download'}
                           </button>
                         </div>
                       ) : (
@@ -388,82 +373,193 @@ export default function App() {
             exit={{ opacity: 0, x: -20 }}
             className="min-h-screen bg-slate-50 p-4 sm:p-8"
           >
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-7xl mx-auto">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                <h2 className="text-3xl font-bold text-slate-900">Enter Details</h2>
-                <button 
-                  onClick={() => setStep('selection')}
-                  className="flex items-center gap-2 text-slate-500 hover:text-slate-800 font-medium transition-colors"
-                >
-                  <ArrowLeft size={20} /> Back to Templates
-                </button>
+                <div>
+                  <h2 className="text-3xl font-bold text-slate-900">Customize Your Page</h2>
+                  <p className="text-slate-500">Fill in the details and see them update in real-time</p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <button 
+                    onClick={() => setShowTemplateSwitcher(!showTemplateSwitcher)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl border font-medium transition-all ${
+                      showTemplateSwitcher 
+                      ? 'bg-indigo-600 text-white border-indigo-600' 
+                      : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-500 hover:text-indigo-600'
+                    }`}
+                  >
+                    <Palette size={20} /> 
+                    {showTemplateSwitcher ? 'Close Switcher' : 'Change Template'}
+                  </button>
+                  <button 
+                    onClick={() => setStep('landing')}
+                    className="flex items-center gap-2 text-slate-400 hover:text-slate-600 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
 
-              <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-10 lg:p-12">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-                  <div className="space-y-6">
-                    <h3 className="text-lg font-bold text-indigo-600 flex items-center gap-2">
-                      <div className="w-2 h-6 bg-indigo-500 rounded-full" />
-                      Assignment Info
-                    </h3>
-                    <div className="space-y-4">
-                      <div className="space-y-1.5">
-                        <label className="text-sm font-semibold text-slate-600 ml-1">College Logo</label>
-                        <div className="flex flex-col sm:flex-row items-center gap-4">
-                          {formData.logoUrl && (
-                            <img src={formData.logoUrl} alt="Logo Preview" className="w-16 h-16 rounded-full object-cover border border-slate-200" />
-                          )}
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleLogoUpload}
-                            className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                          />
+              {showTemplateSwitcher && (
+                <motion.div 
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-6 mb-8 border border-white overflow-hidden"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-bold text-slate-800">Quick Template Switcher</h3>
+                    <p className="text-xs text-slate-400">Pick a design to see it instantly</p>
+                  </div>
+                  <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                    {templateList.map(t => (
+                      <button
+                        key={t.id}
+                        onClick={() => setSelectedTemplate(t.id)}
+                        className={`flex-shrink-0 group relative w-32 aspect-[210/295] rounded-xl overflow-hidden border-2 transition-all ${
+                          selectedTemplate === t.id 
+                          ? 'border-indigo-500 ring-4 ring-indigo-500/10' 
+                          : 'border-slate-100 hover:border-indigo-300'
+                        }`}
+                      >
+                        <div className="absolute inset-0 scale-[0.15] origin-top-left w-[210mm] h-[295mm] pointer-events-none">
+                          {React.createElement(t.component, { data: formData })}
+                        </div>
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
+                        <div className="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm p-1.5 text-[10px] font-bold text-slate-600 text-center border-t border-slate-100">
+                          {t.name}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+                {/* Form Side */}
+                <div className="xl:col-span-7 space-y-6">
+                  <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 p-6 sm:p-10 border border-white">
+                    <div className="space-y-10">
+                      <div>
+                        <h3 className="text-lg font-bold text-indigo-600 flex items-center gap-2 mb-6">
+                          <div className="w-2 h-6 bg-indigo-500 rounded-full" />
+                          Assignment Info
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="md:col-span-2 space-y-1.5">
+                            <label className="text-sm font-semibold text-slate-600 ml-1">College Logo</label>
+                            <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                              <div className="w-16 h-16 rounded-xl bg-white flex items-center justify-center border border-slate-100 overflow-hidden shrink-0">
+                                {formData.logoUrl ? (
+                                  <img src={formData.logoUrl} alt="Logo" className="w-full h-full object-contain" />
+                                ) : (
+                                  <Palette className="text-slate-200" size={24} />
+                                )}
+                              </div>
+                              <div className="flex-1">
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={handleLogoUpload}
+                                  className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer"
+                                />
+                                <p className="text-[10px] text-slate-400 mt-1 ml-1">Recommended: Square PNG or JPG</p>
+                              </div>
+                            </div>
+                          </div>
+                          <InputField label="Assignment Topic" name="topic" value={formData.topic} onChange={handleInputChange} placeholder="e.g. Impact of AI on Modern Society" />
+                          <InputField label="Subject Name" name="subject" value={formData.subject} onChange={handleInputChange} placeholder="e.g. Computer Science" />
+                          <InputField label="Subject Code" name="subjectCode" value={formData.subjectCode} onChange={handleInputChange} placeholder="e.g. CS101" />
+                          <InputField label="College/University Name" name="collegeName" value={formData.collegeName} onChange={handleInputChange} placeholder="e.g. Harvard University" />
                         </div>
                       </div>
-                      <InputField label="Assignment Topic" name="topic" value={formData.topic} onChange={handleInputChange} placeholder="e.g. Impact of AI on Modern Society" />
-                      <InputField label="Subject Name" name="subject" value={formData.subject} onChange={handleInputChange} placeholder="e.g. Computer Science" />
-                      <InputField label="Subject Code" name="subjectCode" value={formData.subjectCode} onChange={handleInputChange} placeholder="e.g. CS101" />
-                      <InputField label="College/University Name" name="collegeName" value={formData.collegeName} onChange={handleInputChange} placeholder="e.g. Harvard University" />
-                    </div>
-                  </div>
 
-                  <div className="space-y-6">
-                    <h3 className="text-lg font-bold text-indigo-600 flex items-center gap-2">
-                      <div className="w-2 h-6 bg-indigo-500 rounded-full" />
-                      Student Details
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="sm:col-span-2">
-                        <InputField label="Student Name" name="studentName" value={formData.studentName} onChange={handleInputChange} placeholder="John Doe" />
+                      <div className="pt-10 border-t border-slate-50">
+                        <h3 className="text-lg font-bold text-indigo-600 flex items-center gap-2 mb-6">
+                          <div className="w-2 h-6 bg-indigo-500 rounded-full" />
+                          Student Details
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="md:col-span-2">
+                            <InputField label="Student Name" name="studentName" value={formData.studentName} onChange={handleInputChange} placeholder="John Doe" />
+                          </div>
+                          <InputField label="Roll Number" name="rollNumber" value={formData.rollNumber} onChange={handleInputChange} placeholder="123456" />
+                          <InputField label="Department" name="department" value={formData.department} onChange={handleInputChange} placeholder="B.Sc CS" />
+                          <InputField label="Year" name="year" value={formData.year} onChange={handleInputChange} placeholder="3rd Year" />
+                          <InputField label="Session" name="session" value={formData.session} onChange={handleInputChange} placeholder="2023-24" />
+                        </div>
                       </div>
-                      <InputField label="Roll Number" name="rollNumber" value={formData.rollNumber} onChange={handleInputChange} placeholder="123456" />
-                      <InputField label="Department" name="department" value={formData.department} onChange={handleInputChange} placeholder="B.Sc CS" />
-                      <InputField label="Year" name="year" value={formData.year} onChange={handleInputChange} placeholder="3rd Year" />
-                      <InputField label="Session" name="session" value={formData.session} onChange={handleInputChange} placeholder="2023-24" />
-                    </div>
-                  </div>
 
-                  <div className="lg:col-span-2 space-y-6 pt-6 border-t border-slate-100">
-                    <h3 className="text-lg font-bold text-indigo-600 flex items-center gap-2">
-                      <div className="w-2 h-6 bg-indigo-500 rounded-full" />
-                      Submission Details
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      <InputField label="Teacher Name" name="teacherName" value={formData.teacherName} onChange={handleInputChange} placeholder="Dr. Smith" />
-                      <InputField label="Teacher Designation" name="teacherDesignation" value={formData.teacherDesignation} onChange={handleInputChange} placeholder="Assistant Professor" />
-                      <InputField label="Submission Date" name="date" value={formData.date} onChange={handleInputChange} placeholder="MM/DD/YYYY" />
+                      <div className="pt-10 border-t border-slate-50">
+                        <h3 className="text-lg font-bold text-indigo-600 flex items-center gap-2 mb-6">
+                          <div className="w-2 h-6 bg-indigo-500 rounded-full" />
+                          Submission Details
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          <InputField label="Teacher Name" name="teacherName" value={formData.teacherName} onChange={handleInputChange} placeholder="Dr. Smith" />
+                          <InputField label="Teacher Designation" name="teacherDesignation" value={formData.teacherDesignation} onChange={handleInputChange} placeholder="Assistant Professor" />
+                          <InputField label="Submission Date" name="date" value={formData.date} onChange={handleInputChange} placeholder="MM/DD/YYYY" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-12 flex flex-col sm:flex-row gap-4">
+                      <button
+                        onClick={() => setStep('preview')}
+                        className="flex-1 bg-indigo-600 text-white py-5 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-200 hover:bg-indigo-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                      >
+                        Final Preview
+                        <ChevronRight size={20} />
+                      </button>
+                      <div className="flex-1 flex flex-col gap-2">
+                        <button
+                          onClick={() => downloadPDF()}
+                          disabled={isGenerating}
+                          className="w-full bg-white text-indigo-600 border-2 border-indigo-50 py-4 rounded-2xl font-bold text-lg hover:border-indigo-500 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                          {isGenerating ? <div className="w-5 h-5 border-2 border-indigo-600/30 border-t-indigo-600 rounded-full animate-spin" /> : <Download size={20} />}
+                          Download PDF
+                        </button>
+                        <button
+                          onClick={downloadImage}
+                          disabled={isGenerating}
+                          className="w-full bg-white text-emerald-600 border-2 border-emerald-50 py-2 rounded-xl font-bold text-sm hover:border-emerald-500 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                          <ImageIcon size={18} />
+                          Download as Image (PNG)
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-12">
+                {/* Preview Side */}
+                <div className="xl:col-span-5 hidden xl:block sticky top-8 h-[calc(100vh-4rem)]">
+                  <div className="bg-slate-200/50 rounded-[2.5rem] p-8 h-full flex flex-col items-center justify-center border border-slate-200 overflow-hidden relative group">
+                    <div className="absolute top-6 left-6 flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full text-xs font-bold text-slate-500 border border-white shadow-sm z-10">
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                      Live Preview
+                    </div>
+                    
+                    <div className="transform scale-[0.45] origin-center shadow-2xl rounded-sm overflow-hidden">
+                      <SelectedTemplateComponent data={formData} />
+                    </div>
+
+                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-2xl">
+                        <MousePointer2 size={16} />
+                        Updates as you type
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mobile Preview Toggle */}
+                <div className="xl:hidden fixed bottom-6 right-6 z-50">
                   <button
                     onClick={() => setStep('preview')}
-                    className="w-full bg-indigo-600 text-white py-5 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-200 hover:bg-indigo-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                    className="w-16 h-16 bg-indigo-600 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
                   >
-                    Preview & Download
-                    <ChevronRight size={20} />
+                    <Eye size={28} />
                   </button>
                 </div>
               </div>
@@ -489,10 +585,24 @@ export default function App() {
               <div className="flex flex-col gap-4 w-full">
                 <button
                   onClick={downloadPDF}
-                  className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-bold text-xl shadow-xl shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center gap-3"
+                  disabled={isGenerating}
+                  className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-bold text-xl shadow-xl shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                 >
-                  <Download size={24} />
-                  Download PDF Now
+                  {isGenerating ? (
+                    <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <Download size={24} />
+                  )}
+                  {isGenerating ? 'Generating PDF...' : 'Download PDF Now'}
+                </button>
+
+                <button
+                  onClick={downloadImage}
+                  disabled={isGenerating}
+                  className="w-full py-4 bg-white text-indigo-600 border-2 border-indigo-100 rounded-2xl font-bold text-lg hover:border-indigo-500 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                >
+                  <ImageIcon size={24} />
+                  Download as Image (PNG)
                 </button>
                 
                 <div className="grid grid-cols-2 gap-4">
@@ -511,21 +621,22 @@ export default function App() {
                   </button>
                 </div>
               </div>
-
-              {/* Hidden preview element for PDF generation */}
-              <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', pointerEvents: 'none' }}>
-                <div ref={previewRef}>
-                  {downloadingId ? (
-                    DownloadingTemplateComponent && <DownloadingTemplateComponent data={formData} />
-                  ) : (
-                    <SelectedTemplateComponent data={formData} />
-                  )}
-                </div>
-              </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Hidden preview element for PDF generation - always available */}
+      <div style={{ position: 'fixed', left: '-9999px', top: '0', pointerEvents: 'none', width: '210mm', height: '295mm', backgroundColor: 'white', zIndex: -1 }}>
+        <div ref={previewRef} key={JSON.stringify(formData) + (downloadingId || selectedTemplate)} style={{ width: '210mm', height: '295mm', position: 'relative' }}>
+          {downloadingId ? (
+            templateList.find(t => t.id === downloadingId)?.component && 
+            React.createElement(templateList.find(t => t.id === downloadingId)!.component, { data: formData })
+          ) : (
+            <SelectedTemplateComponent data={formData} />
+          )}
+        </div>
+      </div>
     </div>
   );
 }

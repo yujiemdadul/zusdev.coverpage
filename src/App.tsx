@@ -215,6 +215,12 @@ export default function App() {
     return () => window.removeEventListener('resize', updateScale);
   }, [step]);
 
+  // Scroll to top on step change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    setShowTemplateSwitcher(false);
+  }, [step]);
+
   return (
     <div className="min-h-screen font-['Poppins'] overflow-x-hidden">
       <AnimatePresence mode="wait">
@@ -360,7 +366,7 @@ export default function App() {
                             className="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-100"
                           >
                             <CheckCircle2 size={18} />
-                            Select & Preview
+                            Select & Download
                           </button>
                           <button
                             onClick={() => {
@@ -477,9 +483,9 @@ export default function App() {
                 </motion.div>
               )}
 
-              <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+              <div className="max-w-4xl mx-auto">
                 {/* Form Side */}
-                <div className="xl:col-span-7 space-y-6">
+                <div className="space-y-6">
                   <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 p-6 sm:p-10 border border-white">
                     <div className="space-y-10">
                       <div>
@@ -550,42 +556,11 @@ export default function App() {
                         onClick={() => setStep('preview')}
                         className="w-full bg-indigo-600 text-white py-5 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-200 hover:bg-indigo-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                       >
-                        View Final Preview & Download
+                        Proceed to Download
                         <ChevronRight size={20} />
                       </button>
                     </div>
                   </div>
-                </div>
-
-                {/* Preview Side */}
-                <div className="xl:col-span-5 hidden xl:block sticky top-8 h-[calc(100vh-4rem)]">
-                  <div className="bg-slate-200/50 rounded-[2.5rem] p-8 h-full flex flex-col items-center justify-center border border-slate-200 overflow-hidden relative group">
-                    <div className="absolute top-6 left-6 flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full text-xs font-bold text-slate-500 border border-white shadow-sm z-10">
-                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                      Live Preview
-                    </div>
-                    
-                    <div className="transform scale-[0.45] origin-center shadow-2xl rounded-sm overflow-hidden">
-                      <SelectedTemplateComponent data={formData} />
-                    </div>
-
-                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-2xl">
-                        <MousePointer2 size={16} />
-                        Updates as you type
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Mobile Preview Toggle */}
-                <div className="xl:hidden fixed bottom-6 right-6 z-50">
-                  <button
-                    onClick={() => setStep('preview')}
-                    className="w-16 h-16 bg-indigo-600 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
-                  >
-                    <Eye size={28} />
-                  </button>
                 </div>
               </div>
             </div>
@@ -598,47 +573,24 @@ export default function App() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="min-h-screen p-4 sm:p-12 flex flex-col items-center bg-slate-50"
+            className="min-h-screen p-4 sm:p-12 flex flex-col items-center justify-center bg-slate-50"
           >
-            <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-              {/* Preview Side */}
-              <div className="bg-slate-200/50 rounded-[2.5rem] p-4 sm:p-8 flex flex-col items-center justify-start border border-slate-200 overflow-hidden relative min-h-[500px] lg:min-h-[800px]">
-                <div className="absolute top-6 left-6 flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full text-xs font-bold text-slate-500 border border-white shadow-sm z-10">
-                  <FileText size={14} className="text-indigo-500" />
-                  Final Document Preview
-                </div>
-                
-                <div className="preview-wrapper w-full flex justify-center mt-12">
-                  <div 
-                    style={{ 
-                      transform: `scale(${scale})`,
-                      transformOrigin: 'top center',
-                      width: '794px',
-                      height: '1115px',
-                      marginBottom: `calc(1115px * ${scale} - 1115px)`
-                    }}
-                    className="shadow-2xl rounded-sm overflow-hidden bg-white shrink-0"
-                  >
-                    <SelectedTemplateComponent data={formData} />
-                  </div>
-                </div>
-              </div>
-
+            <div className="max-w-2xl w-full">
               {/* Actions Side */}
-              <div className="bg-white p-8 sm:p-12 rounded-[2.5rem] shadow-2xl shadow-indigo-100 border border-white flex flex-col">
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center shrink-0">
-                    <CheckCircle2 size={32} />
+              <div className="bg-white p-8 sm:p-12 rounded-[2.5rem] shadow-2xl shadow-indigo-100 border border-white flex flex-col items-center text-center">
+                <div className="flex flex-col items-center gap-4 mb-8">
+                  <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-3xl flex items-center justify-center shrink-0">
+                    <CheckCircle2 size={40} />
                   </div>
                   <div>
-                    <h2 className="text-2xl sm:text-3xl font-black text-slate-900">Ready to Download!</h2>
+                    <h2 className="text-3xl sm:text-4xl font-black text-slate-900">Ready to Download!</h2>
                     <p className="text-slate-500 font-medium">Your assignment cover page is perfectly generated.</p>
                   </div>
                 </div>
                 
-                <div className="space-y-6">
-                  <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-                    <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <div className="space-y-6 w-full">
+                  <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 w-full">
+                    <h3 className="font-bold text-slate-800 mb-4 flex items-center justify-center gap-2">
                       <Sparkles size={18} className="text-yellow-500" />
                       Download Options
                     </h3>
@@ -657,7 +609,7 @@ export default function App() {
                     <p className="text-[10px] text-slate-400 text-center mt-3 uppercase tracking-widest font-bold">High Quality • 300 DPI • Print Ready</p>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
                     <button
                       onClick={() => setStep('form')}
                       className="py-4 bg-white text-slate-700 rounded-2xl font-bold border-2 border-slate-100 hover:border-indigo-500 hover:text-indigo-600 active:scale-95 transition-all flex items-center justify-center gap-2"

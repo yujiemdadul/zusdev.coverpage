@@ -14,7 +14,8 @@ import {
   Eye,
   MousePointer2,
   RefreshCw,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Facebook
 } from 'lucide-react';
 import * as htmlToImage from 'html-to-image';
 import { jsPDF } from 'jspdf';
@@ -54,6 +55,57 @@ const templateList = [
   { id: 'SoftGradient', name: 'Soft Gradient', component: Templates.SoftGradient, color: 'bg-sky-300' },
   { id: 'AcademicShield', name: 'Academic Shield', component: Templates.AcademicShield, color: 'bg-red-900' },
   { id: 'GovernmentCollege', name: 'Govt. College Style', component: Templates.GovernmentCollege, color: 'bg-emerald-600' },
+  // New Templates
+  { id: 'ModernMinimalBlue', name: 'Minimal Blue', component: Templates.ModernMinimalBlue, color: 'bg-blue-600' },
+  { id: 'ModernMinimalRed', name: 'Minimal Red', component: Templates.ModernMinimalRed, color: 'bg-red-600' },
+  { id: 'ModernMinimalEmerald', name: 'Minimal Emerald', component: Templates.ModernMinimalEmerald, color: 'bg-emerald-600' },
+  { id: 'ModernMinimalAmber', name: 'Minimal Amber', component: Templates.ModernMinimalAmber, color: 'bg-amber-600' },
+  { id: 'GeometricAccentPurple', name: 'Geometric Purple', component: Templates.GeometricAccentPurple, color: 'bg-purple-600' },
+  { id: 'GeometricAccentEmerald', name: 'Geometric Emerald', component: Templates.GeometricAccentEmerald, color: 'bg-emerald-600' },
+  { id: 'GeometricAccentRose', name: 'Geometric Rose', component: Templates.GeometricAccentRose, color: 'bg-rose-600' },
+  { id: 'GeometricAccentSky', name: 'Geometric Sky', component: Templates.GeometricAccentSky, color: 'bg-sky-600' },
+  { id: 'BorderFocusSlate', name: 'Border Slate', component: Templates.BorderFocusSlate, color: 'bg-slate-900' },
+  { id: 'BorderFocusIndigo', name: 'Border Indigo', component: Templates.BorderFocusIndigo, color: 'bg-indigo-600' },
+  { id: 'BorderFocusEmerald', name: 'Border Emerald', component: Templates.BorderFocusEmerald, color: 'bg-emerald-600' },
+  { id: 'BorderFocusAmber', name: 'Border Amber', component: Templates.BorderFocusAmber, color: 'bg-amber-600' },
+  { id: 'SidebarElegantRose', name: 'Sidebar Rose', component: Templates.SidebarElegantRose, color: 'bg-rose-500' },
+  { id: 'SidebarElegantAmber', name: 'Sidebar Amber', component: Templates.SidebarElegantAmber, color: 'bg-amber-500' },
+  { id: 'SidebarElegantIndigo', name: 'Sidebar Indigo', component: Templates.SidebarElegantIndigo, color: 'bg-indigo-600' },
+  { id: 'SidebarElegantTeal', name: 'Sidebar Teal', component: Templates.SidebarElegantTeal, color: 'bg-teal-600' },
+  { id: 'TechGridBlue', name: 'Tech Blue', component: Templates.TechGridBlue, color: 'bg-indigo-600' },
+  { id: 'TechGridCyan', name: 'Tech Cyan', component: Templates.TechGridCyan, color: 'bg-cyan-600' },
+  { id: 'TechGridRose', name: 'Tech Rose', component: Templates.TechGridRose, color: 'bg-rose-600' },
+  { id: 'TechGridAmber', name: 'Tech Amber', component: Templates.TechGridAmber, color: 'bg-amber-600' },
+  { id: 'SoftPastelMint', name: 'Pastel Mint', component: Templates.SoftPastelMint, color: 'bg-emerald-400' },
+  { id: 'SoftPastelSky', name: 'Pastel Sky', component: Templates.SoftPastelSky, color: 'bg-sky-400' },
+  { id: 'SoftPastelRose', name: 'Pastel Rose', component: Templates.SoftPastelRose, color: 'bg-rose-400' },
+  { id: 'SoftPastelViolet', name: 'Pastel Violet', component: Templates.SoftPastelViolet, color: 'bg-violet-400' },
+  { id: 'BoldTypographyBlack', name: 'Bold Black', component: Templates.BoldTypographyBlack, color: 'bg-slate-900' },
+  { id: 'BoldTypographyIndigo', name: 'Bold Indigo', component: Templates.BoldTypographyIndigo, color: 'bg-indigo-600' },
+  { id: 'BoldTypographyEmerald', name: 'Bold Emerald', component: Templates.BoldTypographyEmerald, color: 'bg-emerald-600' },
+  { id: 'BoldTypographyAmber', name: 'Bold Amber', component: Templates.BoldTypographyAmber, color: 'bg-amber-600' },
+  { id: 'ClassicAcademicNavy', name: 'Academic Navy', component: Templates.ClassicAcademicNavy, color: 'bg-slate-900' },
+  { id: 'ClassicAcademicMaroon', name: 'Academic Maroon', component: Templates.ClassicAcademicMaroon, color: 'bg-red-900' },
+  { id: 'ClassicAcademicEmerald', name: 'Academic Emerald', component: Templates.ClassicAcademicEmerald, color: 'bg-emerald-900' },
+  { id: 'CreativeWaveBlue', name: 'Wave Blue', component: Templates.CreativeWaveBlue, color: 'bg-blue-600' },
+  { id: 'CreativeWaveOrange', name: 'Wave Orange', component: Templates.CreativeWaveOrange, color: 'bg-orange-500' },
+  { id: 'CreativeWaveEmerald', name: 'Wave Emerald', component: Templates.CreativeWaveEmerald, color: 'bg-emerald-600' },
+  { id: 'CreativeWavePurple', name: 'Wave Purple', component: Templates.CreativeWavePurple, color: 'bg-purple-600' },
+  { id: 'ProfessionalCleanSlate', name: 'Clean Slate', component: Templates.ProfessionalCleanSlate, color: 'bg-slate-500' },
+  { id: 'ProfessionalCleanIndigo', name: 'Clean Indigo', component: Templates.ProfessionalCleanIndigo, color: 'bg-indigo-600' },
+  { id: 'ProfessionalCleanEmerald', name: 'Clean Emerald', component: Templates.ProfessionalCleanEmerald, color: 'bg-emerald-600' },
+  { id: 'ProfessionalCleanAmber', name: 'Clean Amber', component: Templates.ProfessionalCleanAmber, color: 'bg-amber-600' },
+  { id: 'ModernSidebarPurple', name: 'Sidebar Purple', component: Templates.ModernSidebarPurple, color: 'bg-purple-600' },
+  { id: 'ModernSidebarRose', name: 'Sidebar Rose V2', component: Templates.ModernSidebarRose, color: 'bg-rose-600' },
+  { id: 'AbstractWavesIndigo', name: 'Waves Indigo', component: Templates.AbstractWavesIndigo, color: 'bg-indigo-600' },
+  { id: 'AbstractWavesRose', name: 'Waves Rose', component: Templates.AbstractWavesRose, color: 'bg-rose-600' },
+  { id: 'MinimalistCardIndigo', name: 'Card Indigo', component: Templates.MinimalistCardIndigo, color: 'bg-indigo-600' },
+  { id: 'MinimalistCardEmerald', name: 'Card Emerald', component: Templates.MinimalistCardEmerald, color: 'bg-emerald-600' },
+  { id: 'BoldHeaderRed', name: 'Header Red', component: Templates.BoldHeaderRed, color: 'bg-red-900' },
+  { id: 'BoldHeaderEmerald', name: 'Header Emerald', component: Templates.BoldHeaderEmerald, color: 'bg-emerald-900' },
+  { id: 'SoftGradientIndigo', name: 'Gradient Indigo', component: Templates.SoftGradientIndigo, color: 'bg-indigo-400' },
+  { id: 'SoftGradientEmerald', name: 'Gradient Emerald', component: Templates.SoftGradientEmerald, color: 'bg-emerald-400' },
+  { id: 'AcademicShieldNavy', name: 'Shield Navy', component: Templates.AcademicShieldNavy, color: 'bg-slate-900' },
 ];
 
 export default function App() {
@@ -97,44 +149,6 @@ export default function App() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const downloadPDF = async (templateId?: string) => {
-    if (!previewRef.current || isGenerating) return;
-    
-    setIsGenerating(true);
-    const element = previewRef.current;
-    
-    try {
-      // Use html-to-image for better quality and modern CSS support
-      const dataUrl = await htmlToImage.toPng(element, {
-        width: 794, // 210mm at 96dpi
-        height: 1115, // 295mm at 96dpi
-        pixelRatio: 2, // Higher quality
-        backgroundColor: '#ffffff',
-        style: {
-          visibility: 'visible',
-          display: 'block',
-          transform: 'none'
-        }
-      });
-
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      pdf.addImage(dataUrl, 'PNG', 0, 0, 210, 295);
-      pdf.save(`assignment_cover_${formData.studentName || 'page'}.pdf`);
-      
-    } catch (error: any) {
-      console.error('PDF Generation Error:', error);
-      alert('PDF generation failed. Try "Download as Image" instead, or use a different browser.');
-    } finally {
-      setDownloadingId(null);
-      setIsGenerating(false);
-    }
-  };
-
   const downloadImage = async () => {
     if (!previewRef.current || isGenerating) return;
     
@@ -170,7 +184,7 @@ export default function App() {
   const handleDownloadFromSelection = (templateId: string) => {
     setDownloadingId(templateId);
     // Wait for render
-    setTimeout(() => downloadPDF(templateId), 100);
+    setTimeout(() => downloadImage(), 100);
   };
 
   const SelectedTemplateComponent = templateList.find(t => t.id === selectedTemplate)?.component || templateList[0].component;
@@ -183,8 +197,13 @@ export default function App() {
       const container = document.querySelector('.preview-wrapper');
       if (container) {
         const containerWidth = container.clientWidth;
-        // Drastically reduce scale (max 0.35) to ensure it fits on one screen
-        const newScale = Math.min(0.35, (containerWidth - 20) / 794);
+        const containerHeight = window.innerHeight * 0.7; // Use 70% of viewport height as limit
+        
+        const scaleW = (containerWidth - 40) / 794;
+        const scaleH = containerHeight / 1115;
+        
+        // Dynamic scale based on container size, with a reasonable max
+        const newScale = Math.min(0.8, scaleW, scaleH);
         setScale(newScale);
       }
     };
@@ -222,7 +241,7 @@ export default function App() {
               </h1>
               <p className="text-lg sm:text-xl md:text-2xl text-white/80 mb-12 font-light">
                 Create stunning, professional assignment cover pages in seconds. 
-                Choose a template, fill your details, and download as PDF.
+                Choose a template, fill your details, and download as high-quality Image.
               </p>
               <button
                 onClick={() => setStep('selection')}
@@ -231,13 +250,37 @@ export default function App() {
                 Start Designing
                 <ArrowRight className="group-hover:translate-x-1 transition-transform" />
               </button>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8 }}
+                className="mt-8 flex flex-col items-center gap-3"
+              >
+                <p className="text-white/60 text-sm font-medium uppercase tracking-widest">Follow for Updates</p>
+                <a
+                  href="https://facebook.com/zusdev"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center gap-3 bg-blue-600/20 hover:bg-blue-600/40 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/20 transition-all hover:scale-105 active:scale-95"
+                >
+                  <div className="bg-blue-600 p-2 rounded-lg shadow-lg group-hover:rotate-12 transition-transform">
+                    <Facebook size={20} className="text-white" fill="currentColor" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xs text-white/60 font-medium leading-none mb-1">Facebook Page</p>
+                    <p className="text-lg font-bold text-white leading-none">Zusdev</p>
+                  </div>
+                  <ArrowRight size={16} className="text-white/40 group-hover:translate-x-1 transition-transform ml-2" />
+                </a>
+              </motion.div>
             </motion.div>
             
             <div className="mt-16 sm:mt-24 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl w-full">
               {[
-                { icon: Palette, title: "30+ Templates", desc: "Modern, Minimal, Creative & more" },
+                { icon: Palette, title: "70+ Templates", desc: "Modern, Minimal, Creative & more" },
                 { icon: Layout, title: "A4 Ready", desc: "Perfectly sized for printing" },
-                { icon: Download, title: "Instant PDF", desc: "High quality vector downloads" }
+                { icon: Download, title: "Instant Download", desc: "High quality image downloads" }
               ].map((feature, i) => (
                 <motion.div
                   key={i}
@@ -502,32 +545,14 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="mt-12 flex flex-col sm:flex-row gap-4">
+                    <div className="mt-12">
                       <button
                         onClick={() => setStep('preview')}
-                        className="flex-1 bg-indigo-600 text-white py-5 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-200 hover:bg-indigo-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                        className="w-full bg-indigo-600 text-white py-5 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-200 hover:bg-indigo-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                       >
-                        Final Preview
+                        View Final Preview & Download
                         <ChevronRight size={20} />
                       </button>
-                      <div className="flex-1 flex flex-col gap-2">
-                        <button
-                          onClick={() => downloadPDF()}
-                          disabled={isGenerating}
-                          className="w-full bg-white text-indigo-600 border-2 border-indigo-50 py-4 rounded-2xl font-bold text-lg hover:border-indigo-500 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                        >
-                          {isGenerating ? <div className="w-5 h-5 border-2 border-indigo-600/30 border-t-indigo-600 rounded-full animate-spin" /> : <Download size={20} />}
-                          Download PDF
-                        </button>
-                        <button
-                          onClick={downloadImage}
-                          disabled={isGenerating}
-                          className="w-full bg-white text-emerald-600 border-2 border-emerald-50 py-2 rounded-xl font-bold text-sm hover:border-emerald-500 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                        >
-                          <ImageIcon size={18} />
-                          Download as Image (PNG)
-                        </button>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -573,51 +598,88 @@ export default function App() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="min-h-screen p-6 sm:p-12 flex flex-col items-center justify-center bg-slate-50"
+            className="min-h-screen p-4 sm:p-12 flex flex-col items-center bg-slate-50"
           >
-            <div className="w-full max-w-2xl bg-white p-8 sm:p-12 rounded-[2.5rem] shadow-2xl shadow-indigo-100 border border-white flex flex-col items-center text-center">
-              <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-6">
-                <CheckCircle2 size={40} />
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-2">Ready to Download!</h2>
-              <p className="text-slate-500 font-medium mb-12">Your assignment cover page is generated and ready.</p>
-              
-              <div className="flex flex-col gap-4 w-full">
-                <button
-                  onClick={downloadPDF}
-                  disabled={isGenerating}
-                  className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-bold text-xl shadow-xl shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
-                >
-                  {isGenerating ? (
-                    <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <Download size={24} />
-                  )}
-                  {isGenerating ? 'Generating PDF...' : 'Download PDF Now'}
-                </button>
-
-                <button
-                  onClick={downloadImage}
-                  disabled={isGenerating}
-                  className="w-full py-4 bg-white text-indigo-600 border-2 border-indigo-100 rounded-2xl font-bold text-lg hover:border-indigo-500 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
-                >
-                  <ImageIcon size={24} />
-                  Download as Image (PNG)
-                </button>
+            <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+              {/* Preview Side */}
+              <div className="bg-slate-200/50 rounded-[2.5rem] p-4 sm:p-8 flex flex-col items-center justify-start border border-slate-200 overflow-hidden relative min-h-[500px] lg:min-h-[800px]">
+                <div className="absolute top-6 left-6 flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full text-xs font-bold text-slate-500 border border-white shadow-sm z-10">
+                  <FileText size={14} className="text-indigo-500" />
+                  Final Document Preview
+                </div>
                 
-                <div className="grid grid-cols-2 gap-4">
-                  <button
-                    onClick={() => setStep('form')}
-                    className="py-4 bg-white text-slate-700 rounded-2xl font-bold border-2 border-slate-100 hover:border-indigo-500 hover:text-indigo-600 active:scale-95 transition-all flex items-center justify-center gap-2"
+                <div className="preview-wrapper w-full flex justify-center mt-12">
+                  <div 
+                    style={{ 
+                      transform: `scale(${scale})`,
+                      transformOrigin: 'top center',
+                      width: '794px',
+                      height: '1115px',
+                      marginBottom: `calc(1115px * ${scale} - 1115px)`
+                    }}
+                    className="shadow-2xl rounded-sm overflow-hidden bg-white shrink-0"
                   >
-                    <ArrowLeft size={20} />
-                    Edit Details
-                  </button>
+                    <SelectedTemplateComponent data={formData} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions Side */}
+              <div className="bg-white p-8 sm:p-12 rounded-[2.5rem] shadow-2xl shadow-indigo-100 border border-white flex flex-col">
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center shrink-0">
+                    <CheckCircle2 size={32} />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl sm:text-3xl font-black text-slate-900">Ready to Download!</h2>
+                    <p className="text-slate-500 font-medium">Your assignment cover page is perfectly generated.</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-6">
+                  <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                    <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                      <Sparkles size={18} className="text-yellow-500" />
+                      Download Options
+                    </h3>
+                    <button
+                      onClick={downloadImage}
+                      disabled={isGenerating}
+                      className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-bold text-xl shadow-xl shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                    >
+                      {isGenerating ? (
+                        <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <ImageIcon size={24} />
+                      )}
+                      {isGenerating ? 'Generating Image...' : 'Download Image (PNG)'}
+                    </button>
+                    <p className="text-[10px] text-slate-400 text-center mt-3 uppercase tracking-widest font-bold">High Quality • 300 DPI • Print Ready</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <button
+                      onClick={() => setStep('form')}
+                      className="py-4 bg-white text-slate-700 rounded-2xl font-bold border-2 border-slate-100 hover:border-indigo-500 hover:text-indigo-600 active:scale-95 transition-all flex items-center justify-center gap-2"
+                    >
+                      <ArrowLeft size={20} />
+                      Edit Details
+                    </button>
+                    <button
+                      onClick={() => setStep('selection')}
+                      className="py-4 bg-white text-slate-700 rounded-2xl font-bold border-2 border-slate-100 hover:border-indigo-500 hover:text-indigo-600 active:scale-95 transition-all flex items-center justify-center gap-2"
+                    >
+                      <Layout size={20} />
+                      Change Template
+                    </button>
+                  </div>
+
                   <button
-                    onClick={() => setStep('selection')}
-                    className="py-4 bg-white text-slate-700 rounded-2xl font-bold border-2 border-slate-100 hover:border-indigo-500 hover:text-indigo-600 active:scale-95 transition-all flex items-center justify-center gap-2"
+                    onClick={() => setStep('landing')}
+                    className="w-full py-4 text-slate-400 font-bold hover:text-slate-600 transition-colors flex items-center justify-center gap-2"
                   >
-                    Change Template
+                    <RefreshCw size={18} />
+                    Create Another Page
                   </button>
                 </div>
               </div>

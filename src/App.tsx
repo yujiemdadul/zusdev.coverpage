@@ -15,7 +15,8 @@ import {
   MousePointer2,
   RefreshCw,
   Image as ImageIcon,
-  Facebook
+  Facebook,
+  ExternalLink
 } from 'lucide-react';
 import * as htmlToImage from 'html-to-image';
 import { jsPDF } from 'jspdf';
@@ -258,26 +259,56 @@ export default function App() {
               </button>
 
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
-                className="mt-8 flex flex-col items-center gap-3"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ 
+                  opacity: 1, 
+                  y: [20, 0, -5, 0],
+                }}
+                transition={{ 
+                  opacity: { duration: 0.8, delay: 0.8 },
+                  y: { 
+                    duration: 4, 
+                    repeat: Infinity, 
+                    repeatType: "reverse", 
+                    ease: "easeInOut",
+                    delay: 1.6
+                  },
+                  default: { duration: 0.8, delay: 0.8 }
+                }}
+                className="mt-12 group relative inline-block"
               >
-                <p className="text-white/60 text-sm font-medium uppercase tracking-widest">Follow for Updates</p>
+                {/* Glowing Background Effect */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-400 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+                
                 <a
                   href="https://facebook.com/zusdev"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-center gap-3 bg-blue-600/20 hover:bg-blue-600/40 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/20 transition-all hover:scale-105 active:scale-95"
+                  className="relative flex items-center gap-4 bg-white/5 backdrop-blur-xl px-6 py-4 rounded-3xl border border-white/10 transition-all hover:border-white/20 hover:bg-white/10 active:scale-95"
                 >
-                  <div className="bg-blue-600 p-2 rounded-lg shadow-lg group-hover:rotate-12 transition-transform">
-                    <Facebook size={20} className="text-white" fill="currentColor" />
+                  <div className="relative">
+                    <div className="bg-blue-600 p-3 rounded-2xl shadow-xl shadow-blue-500/20 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                      <Facebook size={24} className="text-white" fill="currentColor" />
+                    </div>
+                    <div className="absolute -top-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
+                      <CheckCircle2 size={12} className="text-blue-600" />
+                    </div>
                   </div>
+                  
                   <div className="text-left">
-                    <p className="text-xs text-white/60 font-medium leading-none mb-1">Facebook Page</p>
-                    <p className="text-lg font-bold text-white leading-none">Zusdev</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-lg font-bold text-white tracking-tight">Zusdev</p>
+                      <span className="bg-blue-500/20 text-blue-300 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Official</span>
+                    </div>
+                    <p className="text-sm text-white/50 font-medium">Join our creative community</p>
                   </div>
-                  <ArrowRight size={16} className="text-white/40 group-hover:translate-x-1 transition-transform ml-2" />
+                  
+                  <div className="ml-2 h-8 w-px bg-white/10 hidden sm:block" />
+                  
+                  <div className="flex flex-col items-center ml-2 hidden sm:flex">
+                    <span className="text-[10px] font-black text-blue-400 uppercase tracking-tighter mb-0.5">Follow</span>
+                    <ExternalLink size={16} className="text-white/40 group-hover:text-white transition-all" />
+                  </div>
                 </a>
               </motion.div>
             </motion.div>
